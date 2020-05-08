@@ -17,38 +17,31 @@ namespace Netresearch\Contexts\Form;
 use Netresearch\Contexts\Api\Configuration;
 use Netresearch\Contexts\Context\AbstractContext;
 use Netresearch\Contexts\Context\Container;
-use TYPO3\CMS\Backend\Form\FormEngine;
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Utility\VersionNumberUtility;
+use TYPO3\CMS\Backend\Form\Element\AbstractFormElement;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
  * USER function to render the record settings fields
  *
  * @author Christian Opitz <christian.opitz@netresearch.de>
  */
-class RecordSettingsFormElement
+class RecordSettingsFormElement extends AbstractFormElement
 {
-    /**
-     * Render the context settings field for a certain table
-     *
-     * @param array          $params Array of record information
-     *                               - table - table name
-     *                               - row   - array with database row data
-     * @param FormEngine $formEngineObject
-     * @return string
-     */
-    public function render($params, $formEngineObject)
+
+    public function render()
     {
-        $table = $params['table'];
+        $result = $this->initializeResultArray();
+        $settings = $this->data['parameterArray']['fieldConf']['config']['parameters']['settings'];
+        $table = $this->data['tableName'];
+
 
         $contexts = new Container();
         $contexts->initAll();
 
-        $namePre = str_replace('[' . $params['field'] . '_', '[' . $params['field'] . '][', $params['itemFormElName']);
-
-        $settings = $params['fieldConf']['config']['settings'];
+        $namePre = 'data' . $this->data['elementBaseName'];
 
         $content = '<table class="tx_contexts_table_settings typo3-dblist" style="width: auto; min-width:50%">'
             . '<tbody>'
@@ -62,7 +55,7 @@ class RecordSettingsFormElement
         }
         $content .= '</tr>';
 
-        $uid = (int) $params['row']['uid'];
+        $uid = (int)$this->data['databaseRow']['uid'];
 
         $visibleContexts = 0;
         foreach ($contexts as $context) {
@@ -75,7 +68,7 @@ class RecordSettingsFormElement
             $contSettings = '';
             $bHasSetting = false;
             foreach ($settings as $settingName => $config) {
-                $setting = $uid ? $context->getSetting($table, $settingName, $uid, $params['row']) : null;
+                $setting = $uid ? $context->getSetting($table, $settingName, $uid, $this->data['databaseRow']) : null;
                 $bHasSetting = $bHasSetting || (bool) $setting;
                 $contSettings .= '<td class="tx_contexts_setting">'
                     . '<select name="' . $namePre . '[' . $context->getUid() . '][' . $settingName . ']">'
@@ -85,7 +78,7 @@ class RecordSettingsFormElement
                     . '</select></td>';
             }
 
-            list($icon, $title) = $this->getRecordPreview($context);
+            [$icon, $title] = $this->getRecordPreview($context);
             $content .= '<tr class="db_list_normal">'
                 . '<td class="tx_contexts_context col-icon"">'
                 . $icon . '</td>'
@@ -106,8 +99,8 @@ class RecordSettingsFormElement
         }
 
         $content .= '</tbody></table>';
-
-        return $content;
+        $result['html'] = $content;
+        return $result;
     }
 
     /**

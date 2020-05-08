@@ -25,8 +25,10 @@ namespace Netresearch\Contexts\Context;
 ***************************************************************/
 
 use Netresearch\Contexts\Api\Configuration;
+use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /**
@@ -411,9 +413,15 @@ abstract class AbstractContext
      */
     protected function getSession()
     {
-        return $GLOBALS['TSFE']->fe_user->getKey(
-            'ses', 'contexts-' . $this->uid . '-' . $this->tstamp
-        );
+        $context = GeneralUtility::makeInstance(Context::class);
+        $userContext = $context->getAspect('frontend.user');
+        #DebuggerUtility::var_dump($userContext);
+        #$user = $userContext->get('user');
+        #DebuggerUtility::var_dump($user);
+        #return $GLOBALS['TSFE']->fe_user->getKey(
+        #    'ses', 'contexts-' . $this->uid . '-' . $this->tstamp
+        #);
+        return null;
     }
 
     /**
@@ -426,6 +434,7 @@ abstract class AbstractContext
      */
     protected function storeInSession($bMatch)
     {
+        return $bMatch;
         if (!((bool) $this->use_session)) {
             return $bMatch;
         }
@@ -445,6 +454,7 @@ abstract class AbstractContext
      */
     protected function initTsfe()
     {
+        return;
         if (!isset($GLOBALS['TSFE']) && TYPO3_MODE === 'FE') {
             $GLOBALS['TSFE'] = GeneralUtility::makeInstance(
                 'TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController',

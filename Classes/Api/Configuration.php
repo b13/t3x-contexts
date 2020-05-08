@@ -232,8 +232,10 @@ class Configuration
                 'config' => array(
                     'type' => 'user',
                     'size' => '30',
-                    'userFunc' => 'Netresearch\Contexts\Form\RecordSettingsFormElement->render',
-                    'settings' => $settings,
+                    'renderType' => 'context',
+                    'parameters' => [
+                        'settings' => $settings
+                    ]
                 ),
             );
             $arColumns = array(
