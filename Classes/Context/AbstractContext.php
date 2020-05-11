@@ -25,11 +25,9 @@ namespace Netresearch\Contexts\Context;
 ***************************************************************/
 
 use Netresearch\Contexts\Api\Configuration;
-use TYPO3\CMS\Core\Context\Context;
+use Netresearch\Contexts\Service\FrontendUserContainer;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
-use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /**
  * Abstract context - must be extended by the context types
@@ -130,16 +128,18 @@ abstract class AbstractContext
     protected $bHideInBackend = false;
 
     /**
+     * @var FrontendUserContainer
+     */
+    protected $frontendUserContainer = null;
+
+    /**
      * Constructor - set the values from database row.
      *
      * @param array $arRow Database context row
      */
     public function __construct($arRow = array())
     {
-        //check TSFE is set
-        //prevent Exceptions in eID
-        $this->initTsfe();
-
+        $this->frontendUserContainer = GeneralUtility::makeInstance(FrontendUserContainer::class);
         if (!empty($arRow)) {
             $this->uid            = (int) $arRow['uid'];
             $this->type           = $arRow['type'];
@@ -413,14 +413,10 @@ abstract class AbstractContext
      */
     protected function getSession()
     {
-        $context = GeneralUtility::makeInstance(Context::class);
-        $userContext = $context->getAspect('frontend.user');
-        #DebuggerUtility::var_dump($userContext);
-        #$user = $userContext->get('user');
-        #DebuggerUtility::var_dump($user);
-        #return $GLOBALS['TSFE']->fe_user->getKey(
-        #    'ses', 'contexts-' . $this->uid . '-' . $this->tstamp
-        #);
+        if ($this->frontendUserContainer->hasFrontendUser()) {
+            $feUser = $this->frontendUserContainer->getFrontendUser();
+            return $feUser->getKey('ses', 'contexts-' . $this->uid . '-' . $this->tstamp);
+        }
         return null;
     }
 
@@ -434,34 +430,16 @@ abstract class AbstractContext
      */
     protected function storeInSession($bMatch)
     {
-        return $bMatch;
         if (!((bool) $this->use_session)) {
             return $bMatch;
         }
 
-        /* @var $GLOBALS['TSFE'] tslib_feuserauth */
-        $GLOBALS['TSFE']->fe_user->setKey(
-            'ses', 'contexts-' . $this->uid . '-' . $this->tstamp, $bMatch
-        );
-        $GLOBALS['TSFE']->fe_user->storeSessionData();
-        return $bMatch;
-    }
-
-    /**
-     * Init TSFE with FE user
-     *
-     * @return void
-     */
-    protected function initTsfe()
-    {
-        return;
-        if (!isset($GLOBALS['TSFE']) && TYPO3_MODE === 'FE') {
-            $GLOBALS['TSFE'] = GeneralUtility::makeInstance(
-                'TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController',
-                $GLOBALS['TYPO3_CONF_VARS'], 0, 0
-            );
-            $GLOBALS['TSFE']->initFEuser();
+        if ($this->frontendUserContainer->hasFrontendUser()) {
+            $feUser = $this->frontendUserContainer->getFrontendUser();
+            $feUser->setKey('ses', 'contexts-' . $this->uid . '-' . $this->tstamp, $bMatch);
+            $feUser->storeSessionData();
         }
+        return $bMatch;
     }
 
     /**
