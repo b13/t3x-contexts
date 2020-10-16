@@ -25,10 +25,8 @@ namespace Netresearch\Contexts\Service;
 ***************************************************************/
 use Netresearch\Contexts\Api\Configuration;
 use TYPO3\CMS\Core\Database\ConnectionPool;
-use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
  * Class for TCEmain-hooks: Capture incoming default and record settings
@@ -68,10 +66,8 @@ class DataHandlerService
             return;
         }
 
-        #DebuggerUtility::var_dump($incomingFieldArray);
         if (isset($incomingFieldArray[Configuration::RECORD_SETTINGS_COLUMN])) {
             $this->currentSettings = $incomingFieldArray[Configuration::RECORD_SETTINGS_COLUMN];
-            #DebuggerUtility::var_dump($this->currentSettings);
             unset($incomingFieldArray[Configuration::RECORD_SETTINGS_COLUMN]);
         }
     }
