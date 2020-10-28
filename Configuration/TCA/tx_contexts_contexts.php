@@ -13,7 +13,6 @@ return array(
         'enablecolumns' => array(
             'disabled' => 'disabled'
         ),
-        'requestUpdate' => 'type',
         'adminOnly' => 1,
         'rootLevel' => -1,
         'iconfile'  => 'EXT:contexts/Resources/Public/Icons/tx_contexts_contexts.gif',
@@ -57,13 +56,12 @@ return array(
         'type' => array(
             'exclude' => 0,
             'label' => $lf . ':tx_contexts_contexts.type',
+            'onChange' => 'reload',
             'config' => array(
                 'type' => 'select',
-//                'items' => array(
-//                    array($lf . ':tx_contexts_contexts.type.select_type', '')
-//                ),
+                'renderType' => 'selectSingle',
                 'size' => 1,
-                'maxitems' => 1,
+                'maxitems' => 1
             )
         ),
         'type_conf' => array(

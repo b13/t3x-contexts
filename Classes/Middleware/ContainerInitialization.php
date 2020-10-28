@@ -14,11 +14,14 @@ namespace Netresearch\Contexts\Middleware;
  * The TYPO3 project - inspiring people to share!
  */
 
+use Netresearch\Contexts\Service\FrontendUserContainer;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Netresearch\Contexts\Context\Container;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication;
 
 
 /**
@@ -38,6 +41,11 @@ class ContainerInitialization implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        $feUser = $request->getAttribute('frontend.user', null);
+        if ($feUser instanceof FrontendUserAuthentication) {
+            $frontendUserContainer = GeneralUtility::makeInstance(FrontendUserContainer::class);
+            $frontendUserContainer->setFrontendUserFromRequest($feUser);
+        }
         Container::get()->initMatching();
         return $handler->handle($request);
     }

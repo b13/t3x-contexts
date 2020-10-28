@@ -43,3 +43,9 @@ $signalSlotDispatcher->connect(
     'Netresearch\Contexts\Service\InstallService',
     'appendTableDefinitions'
 );
+
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['nodeRegistry']['contexts'] = [
+    'nodeName' => 'context',
+    'priority' => 40,
+    'class' => \Netresearch\Contexts\Form\RecordSettingsFormElement::class
+];

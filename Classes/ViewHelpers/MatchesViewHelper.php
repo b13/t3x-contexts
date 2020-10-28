@@ -25,6 +25,7 @@ namespace Netresearch\Contexts\ViewHelpers;
 ***************************************************************/
 
 use Netresearch\Contexts\Api\ContextMatcher;
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
  * context match view helper class.
@@ -43,7 +44,7 @@ use Netresearch\Contexts\Api\ContextMatcher;
  * @author     André Hähnel <andre.haehnel@netresearch.de>
  */
 class MatchesViewHelper
-    extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper
+    extends AbstractViewHelper
 {
 
     /**

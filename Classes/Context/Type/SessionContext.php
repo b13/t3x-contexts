@@ -42,11 +42,12 @@ class SessionContext extends AbstractContext
      */
     public function match(array $arDependencies = array())
     {
-        /* @var $GLOBALS['TSFE'] \TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController */
-        $session = $GLOBALS['TSFE']->fe_user->getKey(
-            'ses', $this->getConfValue('field_variable')
-        );
-
+        $session = null;
+        if ($this->frontendUserContainer->hasFrontendUser()) {
+            $feUser = $this->frontendUserContainer->getFrontendUser();
+            $session = $feUser->getKey('ses', $this->getConfValue('field_variable'));
+        }
+        
         return $this->invert($session !== null);
     }
 }
