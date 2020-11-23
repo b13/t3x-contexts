@@ -41,6 +41,7 @@ class ContainerInitialization implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        $GLOBALS['TYPO3_REQUEST'] = $request;
         $feUser = $request->getAttribute('frontend.user', null);
         if ($feUser instanceof FrontendUserAuthentication) {
             $frontendUserContainer = GeneralUtility::makeInstance(FrontendUserContainer::class);
